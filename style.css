@@ -15,54 +15,28 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 80%;
-    max-width: 600px;
+    width: 80%; /* Adjust width as necessary */
 }
 
-header {
+#school-logo {
+    max-width: 150px;
     margin-bottom: 20px;
 }
 
-#landing-logo {
-    max-width: 150px;
-    display: block;
-    margin: 0 auto 20px;
-}
-
-h1.title {
+h1 {
     color: #fbcd07;
 }
 
-h2 {
-    color: #11274e;
-    margin-bottom: 20px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    margin: 10px 0;
-}
-
-a {
-    color: #e82c39;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-footer {
+.game-link {
+    display: inline-block;
     margin-top: 20px;
-    padding: 10px 0;
-    background-color: #11274e;
+    padding: 10px 20px;
+    background-color: #e82c39;
     color: white;
-    text-align: center;
-    border-radius: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.game-link:hover {
+    background-color: #d02532;
 }
