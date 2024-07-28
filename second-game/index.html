@@ -3,13 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Second Game</title>
+    <title>Connections Game Setup</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Second Game</h1>
-    <p>Welcome to the second game!</p>
-    <!-- Game content goes here -->
+    <div id="setup-page">
+        <h1>Setup Connections Game</h1>
+        <div id="word-sets">
+            <h2>Enter 4 sets of words (each set containing 4 words):</h2>
+            <div class="word-set">
+                <input type="text" placeholder="Set 1">
+                <input type="text" placeholder="Set 1">
+                <input type="text" placeholder="Set 1">
+                <input type="text" placeholder="Set 1">
+            </div>
+            <div class="word-set">
+                <input type="text" placeholder="Set 2">
+                <input type="text" placeholder="Set 2">
+                <input type="text" placeholder="Set 2">
+                <input type="text" placeholder="Set 2">
+            </div>
+            <div class="word-set">
+                <input type="text" placeholder="Set 3">
+                <input type="text" placeholder="Set 3">
+                <input type="text" placeholder="Set 3">
+                <input type="text" placeholder="Set 3">
+            </div>
+            <div class="word-set">
+                <input type="text" placeholder="Set 4">
+                <input type="text" placeholder="Set 4">
+                <input type="text" placeholder="Set 4">
+                <input type="text" placeholder="Set 4">
+            </div>
+        </div>
+        <button id="start-game">Start Game</button>
+    </div>
+
+    <div id="game-page" style="display: none;">
+        <h1>Connections Game</h1>
+        <div id="word-grid">
+            <!-- Word buttons will be inserted here dynamically -->
+        </div>
+        <div id="selected-words">
+            <h2>Selected Words:</h2>
+            <div id="selected-list"></div>
+        </div>
+        <button id="submit-set">Submit Set</button>
+        <div id="feedback"></div>
+        <button id="restart-game" style="display: none;">Restart Game</button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
