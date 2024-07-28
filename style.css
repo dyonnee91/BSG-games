@@ -1,42 +1,50 @@
+/* style.css */
 body {
-    font-family: Helvetica, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #11274e;
+    font-family: Arial, sans-serif;
+    background-color: #add8e6; /* Light blue background color */
+    text-align: center;
+    padding: 20px;
 }
 
-#landing-page {
-    background: white;
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 80%; /* Adjust width as necessary */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 #school-logo {
-    max-width: 150px;
+    max-width: 100px;
     margin-bottom: 20px;
 }
 
 h1 {
-    color: #fbcd07;
+    color: #333;
 }
 
-.game-link {
-    display: inline-block;
+p {
+    color: #666;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     margin-top: 20px;
+}
+
+.game-button {
+    display: inline-block;
     padding: 10px 20px;
-    background-color: #e82c39;
+    background-color: red;
     color: white;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
-.game-link:hover {
-    background-color: #d02532;
+.game-button:hover {
+    background-color: darkred;
 }
