@@ -13,13 +13,18 @@ function startGame() {
     for (let set of wordSetInputs) {
         let words = [];
         for (let input of set.querySelectorAll('input')) {
-            if (input.value.trim() === "") {
-                alert("Please fill in all words before starting the game.");
-                return;
+            if (input.value.trim() !== "") {
+                words.push(input.value.trim().toLowerCase());
             }
-            words.push(input.value.trim().toLowerCase());
         }
-        wordSets.push(words);
+        if (words.length > 0) {
+            wordSets.push(words);
+        }
+    }
+
+    if (wordSets.length === 0) {
+        alert("Please enter at least one group of words.");
+        return;
     }
 
     shuffledWords = wordSets.flat().sort(() => 0.5 - Math.random());
@@ -51,20 +56,20 @@ function selectWord(button, word) {
 
 function updateSelectedWords() {
     const selectedList = document.getElementById('selected-list');
-    selectedList.innerHTML = selectedWords.join(', ');
+    selectedList.textContent = selectedWords.join(', ');
 }
 
 function submitSet() {
     const feedback = document.getElementById('feedback');
-    if (selectedWords.length !== 4) {
-        feedback.textContent = "Please select exactly 4 words.";
+    if (selectedWords.length === 0) {
+        feedback.textContent = "Please select at least one word.";
         feedback.style.color = 'red';
         return;
     }
 
     let correctSet = false;
     for (let set of wordSets) {
-        if (selectedWords.every(word => set.includes(word))) {
+        if (selectedWords.length === set.length && selectedWords.every(word => set.includes(word))) {
             correctSets++;
             feedback.textContent = "Correct set!";
             feedback.style.color = 'green';

@@ -29,6 +29,7 @@ input[type="text"] {
     margin: 5px;
     padding: 10px;
     font-size: 16px;
+    width: 22%;
 }
 
 button {
@@ -59,6 +60,8 @@ button:hover {
     color: #11274e;
     border: none;
     cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
 #word-grid button:hover {
@@ -72,4 +75,18 @@ button:hover {
 #feedback {
     margin-top: 20px;
     font-size: 20px;
+}
+
+@media (max-width: 600px) {
+    #word-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    input[type="text"] {
+        width: 40%;
+    }
+
+    #setup-page, #game-page {
+        width: 90%;
+    }
 }
