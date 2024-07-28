@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESL Text Reconstruction Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="text-form">
+        <img id="school-logo" src="school-logo.png" alt="School Logo">
+        <h1 class="title">Text Reconstruction Game</h1>
+        <textarea id="text-input" placeholder="Enter the text here"></textarea>
+        <div id="team-names">
+            <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
+            <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
+        </div>
+        <label for="enable-timer">Enable Timer</label>
+        <input type="checkbox" id="enable-timer">
+        <button id="start-game">Start Game</button>
+    </div>
+
+    <div id="game-board" style="display: none;">
+        <div id="timer" style="display: none;">Time left: 60s</div>
+        <div id="hidden-text"></div>
+        <div id="current-player"></div>
+        <input type="text" id="guess-input" placeholder="Enter your guess">
+        <button id="submit-guess">Submit Guess</button>
+        <button id="give-hint">Give Hint</button>
+        <button id="see-text">See Original Text</button>
+        <div id="team1-score"></div>
+        <div id="team2-score"></div>
+        <div id="winner" style="display: none;"></div>
+        <button id="next-round">Next Round</button>
+        <button id="reset-game">Reset Game</button>
+    </div>
+
+    <div id="score-history"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

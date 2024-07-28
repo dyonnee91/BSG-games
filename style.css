@@ -1,0 +1,96 @@
+body {
+    font-family: Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #11274e;
+}
+
+#text-form, #game-board {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 80%; /* Adjust width as necessary */
+}
+
+textarea, input[type="text"], button {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+}
+
+button {
+    background-color: #e82c39;
+    color: white;
+    cursor: pointer;
+    border: none;
+    width: auto;
+    font-size: 18px;
+}
+
+button:hover {
+    background-color: #d02532;
+}
+
+#game-board {
+    margin-top: 20px;
+    display: none;
+}
+
+#hidden-text {
+    font-size: 24px;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    letter-spacing: 0.2em; /* Adjust the letter spacing */
+}
+
+#current-player, #team1-score, #team2-score {
+    font-weight: bold;
+}
+
+p {
+    font-size: 18px;
+}
+
+.hidden-text-dots {
+    letter-spacing: 0.2em; /* Adjust the letter spacing */
+}
+
+.title, .winner {
+    color: #fbcd07;
+}
+
+#team-names {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#school-logo, #school-logo-game {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+
+#timer {
+    font-size: 20px;
+    margin-top: 10px;
+    color: #fbcd07;
+}
+
+#score-history {
+    margin-top: 20px;
+    color: white;
+}
