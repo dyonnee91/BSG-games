@@ -4,40 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Educational Games</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #fbcd07; /* Blue background color */
+            color: #fff; /* White text color */
+        }
+        #auth-form {
+            display: none; /* Initially hidden */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 300px;
+            width: 100%;
+        }
+        #auth-form input, #auth-form button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        #auth-form button, #guest-button {
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #auth-form button {
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        #auth-form button:hover {
+            background-color: #11274e;
+        }
+        #guest-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        #guest-button:hover {
+            background-color: #218838;
+        }
+        #game-management {
+            padding: 20px;
+        }
+        .game-button {
+            display: block;
+            padding: 10px;
+            margin: 10px auto;
+            background-color: #11274e;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            max-width: 300px;
+            width: 100%;
+        }
+        .game-button:hover {
+            background-color: #11274e;
+        }
+        #overlay {
+            display: none; /* Initially hidden */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        #logo {
+            margin: 20px 0;
+            max-width: 200px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <img id="school-logo" src="school-logo.png" alt="School Logo">
-        <h1>BSG - Games Portal</h1>
-        <p>Select a game to play:</p>
-        <div class="button-container">
-            <a href="text-reconstruction-game/index.html" class="game-button">Text Reconstruction Game</a>
-            <a href="second-game/index.html" class="game-button">Connections Game</a>
-        </div>
+    <!-- Overlay for login form -->
+    <div id="overlay"></div>
 
-        <!-- Authentication Form -->
-        <div id="auth-form">
-            <h2>Login</h2>
-            <input type="email" id="signin-email" placeholder="Email">
-            <input type="password" id="signin-password" placeholder="Password">
-            <button id="signin-button">Sign In</button>
-
-            <h2>Sign Up</h2>
-            <input type="email" id="signup-email" placeholder="Email">
-            <input type="password" id="signup-password" placeholder="Password">
-            <button id="signup-button">Sign Up</button>
-
-            <button id="logout-button">Log Out</button>
-        </div>
+    <!-- Authentication Form -->
+    <div id="auth-form">
+        <h2>Login or Sign Up</h2>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="signup-button">Sign Up</button>
+        <button id="signin-button">Sign In</button>
+        <a href="#" id="guest-button">Play as Guest</a>
     </div>
 
+    <!-- Game Management Section -->
+    <div id="game-management">
+        <img id="logo" src="school-logo.png" alt="Logo"> <!-- Add your logo here -->
+        <h1>BSG - Games Portal</h1>
+        <p>Select a game to play:</p>
+        <a href="text-reconstruction-game/index.html" class="game-button">Text Reconstruction Game</a>
+        <a href="second-game/index.html" class="game-button">Connections Game</a>
+    </div>
+
+    <!-- Sign Out Button -->
+    <button id="logout-button" style="display:none;">Log Out</button>
+
+    <!-- Firebase Scripts -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-        // Your web app's Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyC6JcWqTCvKadpCmiz_75ozSX1pYRep5zU",
             authDomain: "bsg-games.firebaseapp.com",
@@ -53,27 +137,29 @@
 
         // Sign Up
         document.getElementById('signup-button').addEventListener('click', async () => {
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 alert('User signed up successfully!');
+                hideAuthForm();
             } catch (error) {
-                console.error('Error signing up:', error.message);
-                alert('Error signing up: ' + error.message);
+                console.error('Sign Up Error:', error.message);
+                alert('Sign Up Error: ' + error.message);
             }
         });
 
         // Sign In
         document.getElementById('signin-button').addEventListener('click', async () => {
-            const email = document.getElementById('signin-email').value;
-            const password = document.getElementById('signin-password').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 alert('User signed in successfully!');
+                hideAuthForm();
             } catch (error) {
-                console.error('Error signing in:', error.message);
-                alert('Error signing in: ' + error.message);
+                console.error('Sign In Error:', error.message);
+                alert('Sign In Error: ' + error.message);
             }
         });
 
@@ -83,22 +169,38 @@
                 await signOut(auth);
                 alert('User signed out successfully!');
             } catch (error) {
-                console.error('Error signing out:', error.message);
-                alert('Error signing out: ' + error.message);
+                console.error('Log Out Error:', error.message);
+                alert('Log Out Error: ' + error.message);
             }
         });
 
-        // Display content based on authentication state
-        onAuthStateChanged(auth, user => {
+        // Auth State Changed
+        onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is signed in
                 document.getElementById('auth-form').style.display = 'none';
-                // Show game management content here (if applicable)
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('logout-button').style.display = 'block';
             } else {
                 // User is signed out
                 document.getElementById('auth-form').style.display = 'block';
-                // Hide game management content here (if applicable)
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('logout-button').style.display = 'none';
             }
+        });
+
+        // Function to hide the authentication form
+        function hideAuthForm() {
+            document.getElementById('auth-form').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // Play as Guest
+        document.getElementById('guest-button').addEventListener('click', (event) => {
+            event.preventDefault();
+            hideAuthForm(); // Hide the login form
+            // Additional logic for playing as guest if needed
+            alert('Playing as Guest - no login required');
         });
     </script>
 </body>
