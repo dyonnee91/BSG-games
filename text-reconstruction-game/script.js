@@ -20,17 +20,19 @@ document.getElementById('save-game').addEventListener('click', () => {
     }
 
     const gameData = {
-        text: document.getElementById('text-input').value,
-        team1: document.getElementById('team1-name').value,
-        team2: document.getElementById('team2-name').value,
-        enableTimer: document.getElementById('enable-timer').checked,
-        revealedText: revealedText,
-        team1Score: team1Score,
-        team2Score: team2Score,
-        currentPlayer: currentPlayer
+        name: gameName,
+        type: 'text-reconstruction',
+        data: {
+            text: document.getElementById('text-input').value,
+            team1: document.getElementById('team1-name').value,
+            team2: document.getElementById('team2-name').value,
+            enableTimer: document.getElementById('enable-timer').checked
+        }
     };
 
-    localStorage.setItem(gameName, JSON.stringify(gameData));
+    let savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
+    savedGames.push(gameData);
+    localStorage.setItem('savedGames', JSON.stringify(savedGames));
     alert('Game saved!');
 });
 
@@ -42,28 +44,18 @@ document.getElementById('load-game').addEventListener('click', () => {
         return;
     }
 
-    const gameData = JSON.parse(localStorage.getItem(gameName));
+    const savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
+    const gameData = savedGames.find(game => game.name === gameName);
     if (!gameData) {
         alert('No game found with that name.');
         return;
     }
 
-    document.getElementById('text-input').value = gameData.text;
-    document.getElementById('team1-name').value = gameData.team1;
-    document.getElementById('team2-name').value = gameData.team2;
-    document.getElementById('enable-timer').checked = gameData.enableTimer;
-
-    revealedText = gameData.revealedText || [];
-    team1Score = gameData.team1Score || 0;
-    team2Score = gameData.team2Score || 0;
-    currentPlayer = gameData.currentPlayer || 1;
-
-    // Update UI with loaded data
-    document.getElementById('hidden-text').innerHTML = revealedText.join('').replace(/ /g, '&nbsp;');
-    document.getElementById('team1-score').textContent = `${team1Name}: ${team1Score} points`;
-    document.getElementById('team2-score').textContent = `${team2Name}: ${team2Score} points`;
-    document.getElementById('current-player').textContent = currentPlayer === 1 ? `${team1Name}'s turn` : `${team2Name}'s turn`;
-
+    const { text, team1, team2, enableTimer } = gameData.data;
+    document.getElementById('text-input').value = text;
+    document.getElementById('team1-name').value = team1;
+    document.getElementById('team2-name').value = team2;
+    document.getElementById('enable-timer').checked = enableTimer;
     alert('Game loaded!');
 });
 
@@ -73,30 +65,165 @@ function loadGameFromURL() {
     const gameName = urlParams.get('gameName');
     if (!gameName) return;
 
-    const gameData = JSON.parse(localStorage.getItem(gameName));
+    const savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
+    const gameData = savedGames.find(game => game.name === gameName);
     if (!gameData) {
         alert('No game found with that name.');
         return;
     }
 
-    document.getElementById('text-input').value = gameData.text;
-    document.getElementById('team1-name').value = gameData.team1;
-    document.getElementById('team2-name').value = gameData.team2;
-    document.getElementById('enable-timer').checked = gameData.enableTimer;
-
-    revealedText = gameData.revealedText || [];
-    team1Score = gameData.team1Score || 0;
-    team2Score = gameData.team2Score || 0;
-    currentPlayer = gameData.currentPlayer || 1;
-
-    // Update UI with loaded data
-    document.getElementById('hidden-text').innerHTML = revealedText.join('').replace(/ /g, '&nbsp;');
-    document.getElementById('team1-score').textContent = `${team1Name}: ${team1Score} points`;
-    document.getElementById('team2-score').textContent = `${team2Name}: ${team2Score} points`;
-    document.getElementById('current-player').textContent = currentPlayer === 1 ? `${team1Name}'s turn` : `${team2Name}'s turn`;
+    const { text, team1, team2, enableTimer } = gameData.data;
+    document.getElementById('text-input').value = text;
+    document.getElementById('team1-name').value = team1;
+    document.getElementById('team2-name').value = team2;
+    document.getElementById('enable-timer').checked = enableTimer;
 }
 
 // Call the function to load game data on page load
 document.addEventListener('DOMContentLoaded', loadGameFromURL);
 
-// Existing game logic functions...
+document.getElementById('start-game').addEventListener('click', startGame);
+document.getElementById('submit-guess').addEventListener('click', submitGuess);
+document.getElementById('guess-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        submitGuess();
+    }
+});
+document.getElementById('see-text').addEventListener('click', () => {
+    alert(text); // Display the original text in an alert box
+});
+document.getElementById('give-hint').addEventListener('click', giveHint);
+document.getElementById('next-round').addEventListener('click', nextRound);
+document.getElementById('reset-game').addEventListener('click', resetGame);
+
+function startGame() {
+    text = document.getElementById('text-input').value;
+    team1Name = document.getElementById('team1-name').value || 'Team 1';
+    team2Name = document.getElementById('team2-name').value || 'Team 2';
+    hiddenText = text.replace(/\w/g, '_');
+    revealedText = hiddenText.split('');
+    useTimer = document.getElementById('enable-timer').checked;
+    
+    document.getElementById('hidden-text').innerHTML = hiddenText.replace(/ /g, '&nbsp;');
+    document.getElementById('current-player').textContent = `${team1Name}'s turn`;
+    document.getElementById('team1-score').textContent = `${team1Name}: ${team1Score} points`;
+    document.getElementById('team2-score').textContent = `${team2Name}: ${team2Score} points`;
+    document.getElementById('text-form').style.display = 'none';
+    document.getElementById('game-board').style.display = 'block';
+    if (useTimer) {
+        startTimer(); // Start the timer if enabled
+    }
+}
+
+function startTimer() {
+    let timeLeft = turnTime;
+    document.getElementById('timer').style.display = 'block';
+    document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            switchTurn();
+        }
+    }, 1000);
+}
+
+function submitGuess() {
+    if (useTimer) {
+        clearInterval(timerInterval); // Stop the timer when guess is submitted
+    }
+    const guess = document.getElementById('guess-input').value.trim().toLowerCase();
+    document.getElementById('guess-input').value = '';
+
+    // Validate guess input
+    if (guess && /^[a-zA-Z']+$/.test(guess)) {
+        let points = 0;
+        const regex = new RegExp(`\\b${guess}\\b`, 'gi');
+        text.replace(regex, (match, offset) => {
+            for (let i = 0; i < match.length; i++) {
+                revealedText[offset + i] = match[i];
+            }
+            points += match.length;
+        });
+
+        if (points > 0) {
+            if (currentPlayer === 1) {
+                team1Score += points;
+                document.getElementById('team1-score').textContent = `${team1Name}: ${team1Score} points`;
+            } else {
+                team2Score += points;
+                document.getElementById('team2-score').textContent = `${team2Name}: ${team2Score} points`;
+            }
+        }
+
+        document.getElementById('hidden-text').innerHTML = revealedText.join('').replace(/ /g, '&nbsp;');
+        
+        if (!revealedText.includes('_')) {
+            declareWinner();
+        } else {
+            switchTurn();
+        }
+    } else {
+        alert('Please enter a valid single word without spaces.');
+    }
+}
+
+function switchTurn() {
+    if (useTimer) {
+        clearInterval(timerInterval);
+    }
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    document.getElementById('current-player').textContent = currentPlayer === 1 ? `${team1Name}'s turn` : `${team2Name}'s turn`;
+    if (useTimer) {
+        startTimer(); // Restart the timer for the next player if enabled
+    }
+}
+
+function declareWinner() {
+    let winner = '';
+    if (team1Score > team2Score) {
+        winner = `${team1Name} wins!`;
+    } else if (team2Score > team1Score) {
+        winner = `${team2Name} wins!`;
+    } else {
+        winner = 'It\'s a tie!';
+    }
+    alert(`Game over! ${winner}`);
+    resetGame();
+}
+
+function giveHint() {
+    let hint = revealedText.join('').replace(/_/g, ' ').trim();
+    alert(`Hint: ${hint}`);
+}
+
+function nextRound() {
+    // Implement functionality for next round if needed
+    alert('Next round functionality not implemented.');
+}
+
+function resetGame() {
+    // Reset the game variables and UI
+    document.getElementById('text-form').style.display = 'block';
+    document.getElementById('game-board').style.display = 'none';
+    document.getElementById('text-input').value = '';
+    document.getElementById('team1-name').value = '';
+    document.getElementById('team2-name').value = '';
+    document.getElementById('enable-timer').checked = false;
+    document.getElementById('hidden-text').innerHTML = '';
+    document.getElementById('current-player').textContent = '';
+    document.getElementById('timer').style.display = 'none';
+    if (useTimer) {
+        clearInterval(timerInterval);
+    }
+    text = '';
+    hiddenText = '';
+    team1Name = '';
+    team2Name = '';
+    currentPlayer = 1;
+    team1Score = 0;
+    team2Score = 0;
+    revealedText = [];
+}
