@@ -1,15 +1,10 @@
-=<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Educational Games</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        #gameManagement {
-            display: none;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -20,34 +15,23 @@
             <a href="text-reconstruction-game/index.html" class="game-button">Text Reconstruction Game</a>
             <a href="second-game/index.html" class="game-button">Connections Game</a>
         </div>
-
-        <!-- Teacher Login Form -->
-        <div id="loginForm">
-            <h2>Teacher Login</h2>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="signUp()">Sign Up</button>
-            <button onclick="signIn()">Sign In</button>
-            <button onclick="logOut()">Log Out</button>
-        </div>
-
-        <!-- Game Set Management - Hidden by Default -->
-        <div id="gameManagement">
-            <h2>Save Game Set</h2>
-            <input type="text" id="setName" placeholder="Set Name">
-            <input type="text" id="words" placeholder="Words (comma separated)">
-            <button onclick="saveGameSet()">Save Game Set</button>
-
-            <h2>Load Game Sets</h2>
-            <button onclick="getGameSets()">Load Game Sets</button>
-            <div id="gameSets"></div>
+        <!-- Authentication Form -->
+        <div id="auth-form">
+            <h2>Login</h2>
+            <input type="email" id="signin-email" placeholder="Email">
+            <input type="password" id="signin-password" placeholder="Password">
+            <button id="signin-button">Sign In</button>
+            <h2>Sign Up</h2>
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-password" placeholder="Password">
+            <button id="signup-button">Sign Up</button>
+            <button id="logout-button">Log Out</button>
         </div>
     </div>
-
     <script type="module">
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -62,92 +46,53 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        console.log("Firebase initialized:", app);
-
-        // Show or hide content based on authentication state
-        function updateUI(user) {
-            const loginForm = document.getElementById('loginForm');
-            const gameManagement = document.getElementById('gameManagement');
-
-            if (user) {
-                loginForm.style.display = 'none';
-                gameManagement.style.display = 'block';
-            } else {
-                loginForm.style.display = 'block';
-                gameManagement.style.display = 'none';
-            }
-        }
-
-        // Authentication functions
-        async function signUp() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // Sign Up
+        document.getElementById('signup-button').addEventListener('click', async () => {
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                console.log("User signed up:", userCredential.user);
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert('User signed up successfully!');
             } catch (error) {
-                console.error("Error signing up:", error);
+                console.error('Error signing up:', error.message);
             }
-        }
-
-        async function signIn() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log("User signed in:", userCredential.user);
-            } catch (error) {
-                console.error("Error signing in:", error);
-            }
-        }
-
-        async function logOut() {
-            try {
-                await signOut(auth);
-                console.log("User signed out");
-            } catch (error) {
-                console.error("Error signing out:", error);
-            }
-        }
-
-        // Firestore functions
-        async function saveGameSet() {
-            const setName = document.getElementById('setName').value;
-            const words = document.getElementById('words').value.split(',');
-            try {
-                const docRef = await addDoc(collection(db, "gameSets"), {
-                    setName: setName,
-                    words: words
-                });
-                console.log("Document written with ID: ", docRef.id);
-            } catch (error) {
-                console.error("Error adding document: ", error);
-            }
-        }
-
-        async function getGameSets() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "gameSets"));
-                const gameSetsDiv = document.getElementById('gameSets');
-                gameSetsDiv.innerHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const gameSet = doc.data();
-                    const gameSetElement = document.createElement('div');
-                    gameSetElement.textContent = `${doc.id}: ${gameSet.setName} - ${gameSet.words.join(', ')}`;
-                    gameSetsDiv.appendChild(gameSetElement);
-                });
-            } catch (error) {
-                console.error("Error getting documents: ", error);
-            }
-        }
-
-        // Listen for auth state changes
-        onAuthStateChanged(auth, (user) => {
-            updateUI(user);
         });
 
+        // Sign In
+        document.getElementById('signin-button').addEventListener('click', async () => {
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert('User signed in successfully!');
+            } catch (error) {
+                console.error('Error signing in:', error.message);
+            }
+        });
+
+        // Log Out
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                alert('User signed out successfully!');
+            } catch (error) {
+                console.error('Error signing out:', error.message);
+            }
+        });
+
+        // Display content based on authentication state
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                // User is signed in
+                document.getElementById('auth-form').style.display = 'none';
+                // Show game management content here
+            } else {
+                // User is signed out
+                document.getElementById('auth-form').style.display = 'block';
+                // Hide game management content here
+            }
+        });
     </script>
 </body>
 </html>
