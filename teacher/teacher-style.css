@@ -2,37 +2,45 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     margin: 0;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-    color: #333;
-}
-
-#saved-games-list {
-    margin: 20px auto;
-    width: 80%;
-    max-width: 600px;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-ul {
-    list-style-type: none;
     padding: 0;
+    text-align: center;
 }
 
-li {
+#auth-form {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1001; /* Ensure this is above the overlay */
+}
+
+#auth-form input, #auth-form button {
+    display: block;
+    width: 100%;
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    margin: 10px 0;
+    box-sizing: border-box;
 }
 
-li:hover {
-    background-color: #f9f9f9;
-    cursor: pointer;
+#overlay {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Ensure this is below the auth form */
+}
+
+#teacher-content {
+    display: none; /* Initially hidden */
+    padding: 20px;
 }
 
 button {
@@ -42,7 +50,7 @@ button {
     font-size: 16px;
     border: none;
     border-radius: 5px;
-    background-color: #007BFF;
+    background-color: #007bff;
     color: white;
     cursor: pointer;
 }
