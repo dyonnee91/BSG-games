@@ -6,6 +6,7 @@ let wordSets = [];
 let shuffledWords = [];
 let selectedWords = [];
 let correctSets = 0;
+
 // Save Game Functionality
 document.getElementById('save-game').addEventListener('click', () => {
     const gameName = document.getElementById('game-name').value;
@@ -15,7 +16,7 @@ document.getElementById('save-game').addEventListener('click', () => {
     }
 
     const wordSets = Array.from(document.querySelectorAll('.word-set')).map(set => {
-        return Array.from(set.querySelectorAll('input')).map(input => input.value);
+        return Array.from(set.querySelectorAll('input')).map(input => input.value.trim().toLowerCase());
     });
 
     const gameData = { wordSets };
@@ -40,7 +41,7 @@ document.getElementById('load-game').addEventListener('click', () => {
     const wordSets = gameData.wordSets;
     document.querySelectorAll('.word-set').forEach((set, index) => {
         set.querySelectorAll('input').forEach((input, i) => {
-            input.value = wordSets[index][i] || '';
+            input.value = (wordSets[index] && wordSets[index][i]) || '';
         });
     });
 
@@ -62,7 +63,7 @@ function loadGameFromURL() {
     const wordSets = gameData.wordSets;
     document.querySelectorAll('.word-set').forEach((set, index) => {
         set.querySelectorAll('input').forEach((input, i) => {
-            input.value = wordSets[index][i] || '';
+            input.value = (wordSets[index] && wordSets[index][i]) || '';
         });
     });
 }
