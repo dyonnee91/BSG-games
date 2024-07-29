@@ -18,6 +18,9 @@
         <label for="enable-timer">Enable Timer</label>
         <input type="checkbox" id="enable-timer">
         <button id="start-game">Start Game</button>
+        <input type="text" id="game-name" placeholder="Enter Game Name to Save">
+        <button id="save-game">Save Game</button>
+        <button id="load-game">Load Game</button>
     </div>
 
     <div id="game-board" style="display: none;">
@@ -37,10 +40,50 @@
 
     <div id="score-history"></div>
 
-    <!-- Go Back Button -->
     <div style="text-align: center; margin-top: 20px;">
-        <button onclick="window.location.href='https://dyonnee91.github.io/BSG-games/'">Go Back to Main Page</button>
+        <button onclick="window.location.href='../main-index.html'">Go Back to Main Page</button>
     </div>
+
+    <script>
+        document.getElementById('save-game').addEventListener('click', function() {
+            const gameName = document.getElementById('game-name').value;
+            if (!gameName) {
+                alert('Please enter a game name to save.');
+                return;
+            }
+
+            const gameData = {
+                text: document.getElementById('text-input').value,
+                team1: document.getElementById('team1-name').value,
+                team2: document.getElementById('team2-name').value,
+                timer: document.getElementById('enable-timer').checked
+            };
+
+            localStorage.setItem(gameName, JSON.stringify(gameData));
+            alert('Game saved successfully.');
+        });
+
+        document.getElementById('load-game').addEventListener('click', function() {
+            const gameName = document.getElementById('game-name').value;
+            if (!gameName) {
+                alert('Please enter a game name to load.');
+                return;
+            }
+
+            const gameData = localStorage.getItem(gameName);
+            if (!gameData) {
+                alert('No saved game found with this name.');
+                return;
+            }
+
+            const game = JSON.parse(gameData);
+            document.getElementById('text-input').value = game.text;
+            document.getElementById('team1-name').value = game.team1;
+            document.getElementById('team2-name').value = game.team2;
+            document.getElementById('enable-timer').checked = game.timer;
+            alert('Game loaded successfully.');
+        });
+    </script>
 
     <script src="script.js"></script>
 </body>

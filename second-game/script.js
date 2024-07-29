@@ -6,6 +6,69 @@ let wordSets = [];
 let shuffledWords = [];
 let selectedWords = [];
 let correctSets = 0;
+// Save Game Functionality
+document.getElementById('save-game').addEventListener('click', () => {
+    const gameName = document.getElementById('game-name').value;
+    if (!gameName) {
+        alert('Please enter a name for the game.');
+        return;
+    }
+
+    const wordSets = Array.from(document.querySelectorAll('.word-set')).map(set => {
+        return Array.from(set.querySelectorAll('input')).map(input => input.value);
+    });
+
+    const gameData = { wordSets };
+    localStorage.setItem(gameName, JSON.stringify(gameData));
+    alert('Game saved!');
+});
+
+// Load Game Functionality
+document.getElementById('load-game').addEventListener('click', () => {
+    const gameName = prompt('Enter the name of the game to load:');
+    if (!gameName) {
+        alert('Please enter a game name.');
+        return;
+    }
+
+    const gameData = JSON.parse(localStorage.getItem(gameName));
+    if (!gameData) {
+        alert('No game found with that name.');
+        return;
+    }
+
+    const wordSets = gameData.wordSets;
+    document.querySelectorAll('.word-set').forEach((set, index) => {
+        set.querySelectorAll('input').forEach((input, i) => {
+            input.value = wordSets[index][i] || '';
+        });
+    });
+
+    alert('Game loaded!');
+});
+
+// Function to load game data if a game name is passed in the URL
+function loadGameFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameName = urlParams.get('gameName');
+    if (!gameName) return;
+
+    const gameData = JSON.parse(localStorage.getItem(gameName));
+    if (!gameData) {
+        alert('No game found with that name.');
+        return;
+    }
+
+    const wordSets = gameData.wordSets;
+    document.querySelectorAll('.word-set').forEach((set, index) => {
+        set.querySelectorAll('input').forEach((input, i) => {
+            input.value = wordSets[index][i] || '';
+        });
+    });
+}
+
+// Call the function to load game data on page load
+document.addEventListener('DOMContentLoaded', loadGameFromURL);
 
 function startGame() {
     const wordSetInputs = document.querySelectorAll('.word-set');

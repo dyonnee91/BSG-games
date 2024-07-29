@@ -10,6 +10,65 @@ let timerInterval;
 const turnTime = 60; // Time in seconds for each turn
 let useTimer = false;
 let scoreHistory = [];
+// Save Game Functionality
+document.getElementById('save-game').addEventListener('click', () => {
+    const gameName = document.getElementById('game-name').value;
+    if (!gameName) {
+        alert('Please enter a name for the game.');
+        return;
+    }
+
+    const gameData = {
+        text: document.getElementById('text-input').value,
+        team1: document.getElementById('team1-name').value,
+        team2: document.getElementById('team2-name').value,
+        enableTimer: document.getElementById('enable-timer').checked
+    };
+
+    localStorage.setItem(gameName, JSON.stringify(gameData));
+    alert('Game saved!');
+});
+
+// Load Game Functionality
+document.getElementById('load-game').addEventListener('click', () => {
+    const gameName = prompt('Enter the name of the game to load:');
+    if (!gameName) {
+        alert('Please enter a game name.');
+        return;
+    }
+
+    const gameData = JSON.parse(localStorage.getItem(gameName));
+    if (!gameData) {
+        alert('No game found with that name.');
+        return;
+    }
+
+    document.getElementById('text-input').value = gameData.text;
+    document.getElementById('team1-name').value = gameData.team1;
+    document.getElementById('team2-name').value = gameData.team2;
+    document.getElementById('enable-timer').checked = gameData.enableTimer;
+    alert('Game loaded!');
+});
+// Function to load game data if a game name is passed in the URL
+function loadGameFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameName = urlParams.get('gameName');
+    if (!gameName) return;
+
+    const gameData = JSON.parse(localStorage.getItem(gameName));
+    if (!gameData) {
+        alert('No game found with that name.');
+        return;
+    }
+
+    document.getElementById('text-input').value = gameData.text;
+    document.getElementById('team1-name').value = gameData.team1;
+    document.getElementById('team2-name').value = gameData.team2;
+    document.getElementById('enable-timer').checked = gameData.enableTimer;
+}
+
+// Call the function to load game data on page load
+document.addEventListener('DOMContentLoaded', loadGameFromURL);
 
 document.getElementById('start-game').addEventListener('click', startGame);
 document.getElementById('submit-guess').addEventListener('click', submitGuess);

@@ -37,6 +37,9 @@
             </div>
         </div>
         <button id="start-game">Start Game</button>
+        <input type="text" id="game-name" placeholder="Enter Game Name to Save">
+        <button id="save-game">Save Game</button>
+        <button id="load-game">Load Game</button>
     </div>
 
     <div id="game-page" style="display: none;">
@@ -53,11 +56,53 @@
         <button id="restart-game" style="display: none;">Restart Game</button>
     </div>
 
-    <!-- Go Back Button -->
-<div style="text-align: center; margin-top: 20px;">
-    <button onclick="window.location.href='https://dyonnee91.github.io/BSG-games/'">Go Back to Main Page</button>
-  </div>
-  
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="window.location.href='../index.html'">Go Back to Main Page</button>
+    </div>
+
+    <script>
+        document.getElementById('save-game').addEventListener('click', function() {
+            const gameName = document.getElementById('game-name').value;
+            if (!gameName) {
+                alert('Please enter a game name to save.');
+                return;
+            }
+
+            const wordSets = [];
+            document.querySelectorAll('.word-set').forEach(set => {
+                const words = [];
+                set.querySelectorAll('input').forEach(input => words.push(input.value));
+                wordSets.push(words);
+            });
+
+            const gameData = { wordSets };
+
+            localStorage.setItem(gameName, JSON.stringify(gameData));
+            alert('Game saved successfully.');
+        });
+
+        document.getElementById('load-game').addEventListener('click', function() {
+            const gameName = document.getElementById('game-name').value;
+            if (!gameName) {
+                alert('Please enter a game name to load.');
+                return;
+            }
+
+            const gameData = localStorage.getItem(gameName);
+            if (!gameData) {
+                alert('No saved game found with this name.');
+                return;
+            }
+
+            const game = JSON.parse(gameData);
+            document.querySelectorAll('.word-set').forEach((set, index) => {
+                const words = game.wordSets[index];
+                set.querySelectorAll('input').forEach((input, idx) => input.value = words[idx]);
+            });
+
+            alert('Game loaded successfully.');
+        });
+    </script>
 
     <script src="script.js"></script>
 </body>
