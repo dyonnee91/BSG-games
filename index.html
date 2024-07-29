@@ -15,19 +15,23 @@
             <a href="text-reconstruction-game/index.html" class="game-button">Text Reconstruction Game</a>
             <a href="second-game/index.html" class="game-button">Connections Game</a>
         </div>
+
         <!-- Authentication Form -->
         <div id="auth-form">
             <h2>Login</h2>
             <input type="email" id="signin-email" placeholder="Email">
             <input type="password" id="signin-password" placeholder="Password">
             <button id="signin-button">Sign In</button>
+
             <h2>Sign Up</h2>
             <input type="email" id="signup-email" placeholder="Email">
             <input type="password" id="signup-password" placeholder="Password">
             <button id="signup-button">Sign Up</button>
+
             <button id="logout-button">Log Out</button>
         </div>
     </div>
+
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
@@ -56,6 +60,7 @@
                 alert('User signed up successfully!');
             } catch (error) {
                 console.error('Error signing up:', error.message);
+                alert('Error signing up: ' + error.message);
             }
         });
 
@@ -68,6 +73,7 @@
                 alert('User signed in successfully!');
             } catch (error) {
                 console.error('Error signing in:', error.message);
+                alert('Error signing in: ' + error.message);
             }
         });
 
@@ -78,6 +84,7 @@
                 alert('User signed out successfully!');
             } catch (error) {
                 console.error('Error signing out:', error.message);
+                alert('Error signing out: ' + error.message);
             }
         });
 
@@ -86,11 +93,11 @@
             if (user) {
                 // User is signed in
                 document.getElementById('auth-form').style.display = 'none';
-                // Show game management content here
+                // Show game management content here (if applicable)
             } else {
                 // User is signed out
                 document.getElementById('auth-form').style.display = 'block';
-                // Hide game management content here
+                // Hide game management content here (if applicable)
             }
         });
     </script>
