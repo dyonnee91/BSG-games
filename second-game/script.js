@@ -45,12 +45,16 @@ function displayGamePage() {
     const wordGrid = document.getElementById('word-grid');
     wordGrid.innerHTML = '';
 
+    // Display words based on shuffledWords
     for (let word of shuffledWords) {
         const wordButton = document.createElement('button');
         wordButton.textContent = word;
         wordButton.addEventListener('click', () => selectWord(wordButton, word));
         wordGrid.appendChild(wordButton);
     }
+
+    // Optionally, restore any additional game state here (e.g., selectedWords, correctSets)
+    updateSelectedWords();
 }
 
 // Handle Tile Selection
