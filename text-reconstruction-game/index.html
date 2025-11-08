@@ -5,6 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESL Text Reconstruction Game</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #text-form, #game-board {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            font-size: 16px;
+        }
+
+        /* Hidden text box styling */
+        #hidden-text {
+            margin: 10px 0;
+            font-size: 18px;
+            line-height: 1.5;
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 60px;
+            /* Prevent splitting words */
+            word-break: keep-all;
+            white-space: pre-wrap;  /* keep spaces and wrap */
+            overflow-wrap: normal;  /* default wrapping */
+        }
+
+        /* Timer, scores, winner */
+        #timer, #team1-score, #team2-score, #winner {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div id="text-form">
