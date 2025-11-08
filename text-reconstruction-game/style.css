@@ -52,9 +52,10 @@ button:hover {
 #hidden-text {
     font-size: 24px;
     margin-bottom: 20px;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    letter-spacing: 0.2em; /* Adjust the letter spacing */
+    white-space: pre-wrap;  /* Keep line breaks */
+    letter-spacing: 0.2em;  /* Adjust spacing between underscores */
+    word-break: normal;     /* Prevent breaking words */
+    overflow-wrap: normal;  /* Prevent breaking words */
 }
 
 #current-player, #team1-score, #team2-score {
