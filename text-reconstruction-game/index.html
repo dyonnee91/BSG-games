@@ -38,10 +38,8 @@
             border: 1px solid #ccc;
             padding: 10px;
             min-height: 60px;
-            /* Prevent splitting words */
-            word-break: keep-all;
-            white-space: pre-wrap;  /* keep spaces and wrap */
-            overflow-wrap: normal;  /* default wrapping */
+            word-wrap: break-word;
+            white-space: pre-wrap;  
         }
 
         /* Timer, scores, winner */
@@ -90,12 +88,10 @@
     </div>
 
     <script>
+        // Save and load game
         document.getElementById('save-game').addEventListener('click', function() {
             const gameName = document.getElementById('game-name').value;
-            if (!gameName) {
-                alert('Please enter a game name to save.');
-                return;
-            }
+            if (!gameName) { alert('Please enter a game name to save.'); return; }
 
             const gameData = {
                 text: document.getElementById('text-input').value,
@@ -110,16 +106,10 @@
 
         document.getElementById('load-game').addEventListener('click', function() {
             const gameName = document.getElementById('game-name').value;
-            if (!gameName) {
-                alert('Please enter a game name to load.');
-                return;
-            }
+            if (!gameName) { alert('Please enter a game name to load.'); return; }
 
             const gameData = localStorage.getItem(gameName);
-            if (!gameData) {
-                alert('No saved game found with this name.');
-                return;
-            }
+            if (!gameData) { alert('No saved game found with this name.'); return; }
 
             const game = JSON.parse(gameData);
             document.getElementById('text-input').value = game.text;
@@ -127,6 +117,22 @@
             document.getElementById('team2-name').value = game.team2;
             document.getElementById('enable-timer').checked = game.timer;
             alert('Game loaded successfully.');
+        });
+
+        // Function to display underscores properly without breaking words
+        function displayHiddenText(text) {
+            const words = text.split(' ');
+            const lines = words.map(word => '_ '.repeat(word.length).trim());
+            document.getElementById('hidden-text').innerHTML = lines.join(' ');
+        }
+
+        document.getElementById('start-game').addEventListener('click', function() {
+            const text = document.getElementById('text-input').value;
+            if (!text) return alert('Please enter text to start the game.');
+
+            displayHiddenText(text);
+            document.getElementById('text-form').style.display = 'none';
+            document.getElementById('game-board').style.display = 'block';
         });
     </script>
 
