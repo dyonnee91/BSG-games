@@ -1,141 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESL Text Reconstruction Game</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* Basic styling */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESL Text Reconstruction Game</title>
+<link rel="stylesheet" href="style.css">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
 
-        #text-form, #game-board {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    #text-form, #game-board {
+        max-width: 800px;
+        margin: 0 auto;
+    }
 
-        textarea, input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
+    textarea, input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
 
-        button {
-            padding: 8px 12px;
-            margin: 5px;
-            font-size: 16px;
-        }
+    button {
+        padding: 8px 12px;
+        margin: 5px;
+        font-size: 16px;
+    }
 
-        /* Hidden text box styling */
-        #hidden-text {
-            margin: 10px 0;
-            font-size: 18px;
-            line-height: 1.5;
-            border: 1px solid #ccc;
-            padding: 10px;
-            min-height: 60px;
-            word-wrap: break-word;
-            white-space: pre-wrap;  
-        }
+    #hidden-text {
+        margin: 10px 0;
+        font-size: 18px;
+        line-height: 1.5;
+        border: 1px solid #ccc;
+        padding: 10px;
+        min-height: 60px;
+        word-wrap: break-word;
+        white-space: pre-wrap; /* preserve line breaks */
+    }
 
-        /* Timer, scores, winner */
-        #timer, #team1-score, #team2-score, #winner {
-            margin: 10px 0;
-            font-weight: bold;
-        }
-    </style>
+    #hidden-text .word {
+        white-space: nowrap;
+        display: inline-block;
+        margin-right: 0.5em;
+    }
+
+    #timer, #team1-score, #team2-score, #winner {
+        margin: 10px 0;
+        font-weight: bold;
+    }
+</style>
 </head>
 <body>
-    <div id="text-form">
-        <img id="school-logo" src="school-logo.png" alt="School Logo">
-        <h1 class="title">Text Reconstruction Game</h1>
-        <textarea id="text-input" placeholder="Enter the text here"></textarea>
-        <div id="team-names">
-            <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
-            <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
-        </div>
-        <label for="enable-timer">Enable Timer</label>
-        <input type="checkbox" id="enable-timer">
-        <button id="start-game">Start Game</button>
-        <input type="text" id="game-name" placeholder="Enter Game Name to Save">
-        <button id="save-game">Save Game</button>
-        <button id="load-game">Load Game</button>
+<div id="text-form">
+    <img id="school-logo" src="school-logo.png" alt="School Logo">
+    <h1 class="title">Text Reconstruction Game</h1>
+    <textarea id="text-input" placeholder="Enter the text here"></textarea>
+    <div id="team-names">
+        <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
+        <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
     </div>
+    <label for="enable-timer">Enable Timer</label>
+    <input type="checkbox" id="enable-timer">
+    <button id="start-game">Start Game</button>
+    <input type="text" id="game-name" placeholder="Enter Game Name to Save">
+    <button id="save-game">Save Game</button>
+    <button id="load-game">Load Game</button>
+</div>
 
-    <div id="game-board" style="display: none;">
-        <div id="timer" style="display: none;">Time left: 60s</div>
-        <div id="hidden-text"></div>
-        <div id="current-player"></div>
-        <input type="text" id="guess-input" placeholder="Enter your guess">
-        <button id="submit-guess">Submit Guess</button>
-        <button id="give-hint">Give Hint</button>
-        <button id="see-text">See Original Text</button>
-        <div id="team1-score"></div>
-        <div id="team2-score"></div>
-        <div id="winner" style="display: none;"></div>
-        <button id="next-round">Next Round</button>
-        <button id="reset-game">Reset Game</button>
-    </div>
+<div id="game-board" style="display: none;">
+    <div id="timer" style="display: none;">Time left: 60s</div>
+    <div id="hidden-text"></div>
+    <div id="current-player"></div>
+    <input type="text" id="guess-input" placeholder="Enter your guess">
+    <button id="submit-guess">Submit Guess</button>
+    <button id="give-hint">Give Hint</button>
+    <button id="see-text">See Original Text</button>
+    <div id="team1-score"></div>
+    <div id="team2-score"></div>
+    <div id="winner" style="display: none;"></div>
+    <button id="next-round">Next Round</button>
+    <button id="reset-game">Reset Game</button>
+</div>
 
-    <div id="score-history"></div>
+<div id="score-history"></div>
 
-    <div style="text-align: center; margin-top: 20px;">
-        <button onclick="window.location.href='../index.html'">Go Back to Main Page</button>
-    </div>
+<div style="text-align: center; margin-top: 20px;">
+    <button onclick="window.location.href='../index.html'">Go Back to Main Page</button>
+</div>
 
-    <script>
-        // Save and load game
-        document.getElementById('save-game').addEventListener('click', function() {
-            const gameName = document.getElementById('game-name').value;
-            if (!gameName) { alert('Please enter a game name to save.'); return; }
+<script>
+    document.getElementById('save-game').addEventListener('click', function() {
+        const gameName = document.getElementById('game-name').value;
+        if (!gameName) { alert('Please enter a game name to save.'); return; }
 
-            const gameData = {
-                text: document.getElementById('text-input').value,
-                team1: document.getElementById('team1-name').value,
-                team2: document.getElementById('team2-name').value,
-                timer: document.getElementById('enable-timer').checked
-            };
+        const gameData = {
+            text: document.getElementById('text-input').value,
+            team1: document.getElementById('team1-name').value,
+            team2: document.getElementById('team2-name').value,
+            timer: document.getElementById('enable-timer').checked
+        };
 
-            localStorage.setItem(gameName, JSON.stringify(gameData));
-            alert('Game saved successfully.');
+        localStorage.setItem(gameName, JSON.stringify(gameData));
+        alert('Game saved successfully.');
+    });
+
+    document.getElementById('load-game').addEventListener('click', function() {
+        const gameName = document.getElementById('game-name').value;
+        if (!gameName) { alert('Please enter a game name to load.'); return; }
+
+        const gameData = localStorage.getItem(gameName);
+        if (!gameData) { alert('No saved game found with this name.'); return; }
+
+        const game = JSON.parse(gameData);
+        document.getElementById('text-input').value = game.text;
+        document.getElementById('team1-name').value = game.team1;
+        document.getElementById('team2-name').value = game.team2;
+        document.getElementById('enable-timer').checked = game.timer;
+        alert('Game loaded successfully.');
+    });
+
+    // Display underscores without breaking words, preserving lines
+    function displayHiddenText(text) {
+        const container = document.getElementById('hidden-text');
+        container.innerHTML = '';
+
+        const lines = text.split(/\r?\n/); // split by user-entered line breaks
+
+        lines.forEach((line, lineIndex) => {
+            const words = line.split(' ');
+            words.forEach(word => {
+                const span = document.createElement('span');
+                span.className = 'word';
+                span.textContent = '_'.repeat(word.length);
+                container.appendChild(span);
+                container.appendChild(document.createTextNode(' '));
+            });
+            if (lineIndex < lines.length - 1) {
+                container.appendChild(document.createElement('br'));
+            }
         });
+    }
 
-        document.getElementById('load-game').addEventListener('click', function() {
-            const gameName = document.getElementById('game-name').value;
-            if (!gameName) { alert('Please enter a game name to load.'); return; }
+    document.getElementById('start-game').addEventListener('click', function() {
+        const text = document.getElementById('text-input').value;
+        if (!text) return alert('Please enter text to start the game.');
 
-            const gameData = localStorage.getItem(gameName);
-            if (!gameData) { alert('No saved game found with this name.'); return; }
+        displayHiddenText(text);
+        document.getElementById('text-form').style.display = 'none';
+        document.getElementById('game-board').style.display = 'block';
+    });
+</script>
 
-            const game = JSON.parse(gameData);
-            document.getElementById('text-input').value = game.text;
-            document.getElementById('team1-name').value = game.team1;
-            document.getElementById('team2-name').value = game.team2;
-            document.getElementById('enable-timer').checked = game.timer;
-            alert('Game loaded successfully.');
-        });
-
-        // Function to display underscores properly without breaking words
-        function displayHiddenText(text) {
-            const words = text.split(' ');
-            const lines = words.map(word => '_ '.repeat(word.length).trim());
-            document.getElementById('hidden-text').innerHTML = lines.join(' ');
-        }
-
-        document.getElementById('start-game').addEventListener('click', function() {
-            const text = document.getElementById('text-input').value;
-            if (!text) return alert('Please enter text to start the game.');
-
-            displayHiddenText(text);
-            document.getElementById('text-form').style.display = 'none';
-            document.getElementById('game-board').style.display = 'block';
-        });
-    </script>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
