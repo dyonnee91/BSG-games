@@ -49,13 +49,19 @@ button:hover {
     display: none;
 }
 
+/* 🔧 Fix for mid-word breaks */
 #hidden-text {
     font-size: 24px;
     margin-bottom: 20px;
-    white-space: pre-wrap;  /* Keep line breaks */
-    letter-spacing: 0.2em;  /* Adjust spacing between underscores */
-    word-break: normal;     /* Prevent breaking words */
-    overflow-wrap: normal;  /* Prevent breaking words */
+    white-space: pre-wrap;      /* Preserve spacing and line breaks */
+    word-break: keep-all;       /* Prevent breaking words mid-word */
+    overflow-wrap: break-word;  /* Allow wrapping at spaces only */
+    line-break: strict;         /* Keep clean line breaks */
+    letter-spacing: 0.2em;      /* Space between underscores/letters */
+    text-align: left;           /* Better text alignment */
+    display: inline-block;      /* Keep layout stable */
+    max-width: 100%;            /* Prevent overflow */
+    box-sizing: border-box;     /* Include padding in width */
 }
 
 #current-player, #team1-score, #team2-score {
