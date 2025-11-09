@@ -123,25 +123,18 @@
 
     // Display underscores without breaking words, preserving lines
     function displayHiddenText(text) {
-        const container = document.getElementById('hidden-text');
-        container.innerHTML = '';
+    const words = text.split(/\s+/);
+    const container = document.getElementById('hidden-text');
+    container.innerHTML = '';
 
-        const lines = text.split(/\r?\n/); // split by user-entered line breaks
-
-        lines.forEach((line, lineIndex) => {
-            const words = line.split(' ');
-            words.forEach(word => {
-                const span = document.createElement('span');
-                span.className = 'word';
-                span.textContent = '_'.repeat(word.length);
-                container.appendChild(span);
-                container.appendChild(document.createTextNode(' '));
-            });
-            if (lineIndex < lines.length - 1) {
-                container.appendChild(document.createElement('br'));
-            }
-        });
-    }
+    words.forEach((word, index) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.textContent = '_'.repeat(word.length);
+        wordSpan.style.display = 'inline-block';  // keeps whole word together
+        wordSpan.style.marginRight = '0.4em';     // space between words
+        container.appendChild(wordSpan);
+    });
+}
 
     document.getElementById('start-game').addEventListener('click', function() {
         const text = document.getElementById('text-input').value;
