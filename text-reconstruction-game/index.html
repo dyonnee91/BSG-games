@@ -32,23 +32,84 @@
     #hidden-text {
         margin: 10px 0;
         font-size: 18px;
-        line-height: 1.5;
+        line-height: 1.8;
         border: 1px solid #ccc;
         padding: 10px;
         min-height: 60px;
         word-wrap: break-word;
-        white-space: pre-wrap; /* preserve line breaks */
+        white-space: normal;
     }
 
+    /* FIXED: Prevent words from breaking mid-word */
     #hidden-text .word {
-        white-space: nowrap;
         display: inline-block;
+        white-space: nowrap;
         margin-right: 0.5em;
+        letter-spacing: 0.1em;
     }
 
-    #timer, #team1-score, #team2-score, #winner {
+    #timer, .team-score, #winner {
         margin: 10px 0;
         font-weight: bold;
+    }
+
+    #team-names-container {
+        margin-bottom: 15px;
+    }
+
+    .team-input-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .team-input-row input {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .remove-team-btn {
+        padding: 4px 8px;
+        background-color: #ff4444;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+    #add-team-btn {
+        margin-bottom: 10px;
+    }
+
+    #teams-scores {
+        margin: 10px 0;
+    }
+
+    .guessed-words {
+        margin: 15px 0;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
+
+    .guessed-words h3 {
+        margin-top: 0;
+    }
+
+    .guessed-words ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .guessed-words li {
+        background-color: #4CAF50;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 14px;
     }
 </style>
 </head>
@@ -57,16 +118,23 @@
     <img id="school-logo" src="school-logo.png" alt="School Logo">
     <h1 class="title">Text Reconstruction Game</h1>
     <textarea id="text-input" placeholder="Enter the text here"></textarea>
-    <div id="team-names">
-        <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
-        <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
+    
+    <div id="team-names-container">
+        <h3>Team Names:</h3>
+        <div id="team-inputs">
+            <div class="team-input-row">
+                <input type="text" class="team-name-input" placeholder="Team 1 Name">
+            </div>
+            <div class="team-input-row">
+                <input type="text" class="team-name-input" placeholder="Team 2 Name">
+            </div>
+        </div>
+        <button id="add-team-btn">+ Add Team</button>
     </div>
+    
     <label for="enable-timer">Enable Timer</label>
     <input type="checkbox" id="enable-timer">
     <button id="start-game">Start Game</button>
-    <input type="text" id="game-name" placeholder="Enter Game Name to Save">
-    <button id="save-game">Save Game</button>
-    <button id="load-game">Load Game</button>
 </div>
 
 <div id="game-board" style="display: none;">
@@ -77,74 +145,22 @@
     <button id="submit-guess">Submit Guess</button>
     <button id="give-hint">Give Hint</button>
     <button id="see-text">See Original Text</button>
-    <div id="team1-score"></div>
-    <div id="team2-score"></div>
+    
+    <div id="teams-scores"></div>
+    
+    <div class="guessed-words">
+        <h3>Guessed Words:</h3>
+        <ul id="guessed-words-list"></ul>
+    </div>
+    
     <div id="winner" style="display: none;"></div>
     <button id="next-round">Next Round</button>
     <button id="reset-game">Reset Game</button>
 </div>
 
-<div id="score-history"></div>
-
 <div style="text-align: center; margin-top: 20px;">
     <button onclick="window.location.href='../index.html'">Go Back to Main Page</button>
 </div>
-
-<script>
-    document.getElementById('save-game').addEventListener('click', function() {
-        const gameName = document.getElementById('game-name').value;
-        if (!gameName) { alert('Please enter a game name to save.'); return; }
-
-        const gameData = {
-            text: document.getElementById('text-input').value,
-            team1: document.getElementById('team1-name').value,
-            team2: document.getElementById('team2-name').value,
-            timer: document.getElementById('enable-timer').checked
-        };
-
-        localStorage.setItem(gameName, JSON.stringify(gameData));
-        alert('Game saved successfully.');
-    });
-
-    document.getElementById('load-game').addEventListener('click', function() {
-        const gameName = document.getElementById('game-name').value;
-        if (!gameName) { alert('Please enter a game name to load.'); return; }
-
-        const gameData = localStorage.getItem(gameName);
-        if (!gameData) { alert('No saved game found with this name.'); return; }
-
-        const game = JSON.parse(gameData);
-        document.getElementById('text-input').value = game.text;
-        document.getElementById('team1-name').value = game.team1;
-        document.getElementById('team2-name').value = game.team2;
-        document.getElementById('enable-timer').checked = game.timer;
-        alert('Game loaded successfully.');
-    });
-
-    // Display underscores without breaking words, preserving lines
-    function displayHiddenText(text) {
-    const words = text.split(/\s+/);
-    const container = document.getElementById('hidden-text');
-    container.innerHTML = '';
-
-    words.forEach((word, index) => {
-        const wordSpan = document.createElement('span');
-        wordSpan.textContent = '_'.repeat(word.length);
-        wordSpan.style.display = 'inline-block';  // keeps whole word together
-        wordSpan.style.marginRight = '0.4em';     // space between words
-        container.appendChild(wordSpan);
-    });
-}
-
-    document.getElementById('start-game').addEventListener('click', function() {
-        const text = document.getElementById('text-input').value;
-        if (!text) return alert('Please enter text to start the game.');
-
-        displayHiddenText(text);
-        document.getElementById('text-form').style.display = 'none';
-        document.getElementById('game-board').style.display = 'block';
-    });
-</script>
 
 <script src="script.js"></script>
 </body>

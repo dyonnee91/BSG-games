@@ -1,86 +1,43 @@
 let text = '';
 let hiddenText = '';
-let team1Name = '';
-let team2Name = '';
-let currentPlayer = 1;
-let team1Score = 0;
-let team2Score = 0;
+let teams = []; // Array of team objects: { name: string, score: number }
+let currentPlayerIndex = 0;
 let revealedText = [];
+let guessedWords = new Set(); // FIXED: Track guessed words to prevent duplicates
 let timerInterval;
 const turnTime = 60; // Time in seconds for each turn
 let useTimer = false;
-let scoreHistory = [];
 
-// Save Game Functionality
-document.getElementById('save-game').addEventListener('click', () => {
-    const gameName = document.getElementById('game-name').value;
-    if (!gameName) {
-        alert('Please enter a name for the game.');
-        return;
-    }
-
-    const gameData = {
-        name: gameName,
-        type: 'text-reconstruction',
-        data: {
-            text: document.getElementById('text-input').value,
-            team1: document.getElementById('team1-name').value,
-            team2: document.getElementById('team2-name').value,
-            enableTimer: document.getElementById('enable-timer').checked
-        }
-    };
-
-    let savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
-    savedGames.push(gameData);
-    localStorage.setItem('savedGames', JSON.stringify(savedGames));
-    alert('Game saved!');
+// Add/Remove Team functionality
+document.getElementById('add-team-btn').addEventListener('click', () => {
+    const teamInputs = document.getElementById('team-inputs');
+    const teamNumber = teamInputs.children.length + 1;
+    
+    const row = document.createElement('div');
+    row.className = 'team-input-row';
+    row.innerHTML = `
+        <input type="text" class="team-name-input" placeholder="Team ${teamNumber} Name">
+        <button class="remove-team-btn" onclick="removeTeam(this)">Remove</button>
+    `;
+    teamInputs.appendChild(row);
 });
 
-// Load Game Functionality
-document.getElementById('load-game').addEventListener('click', () => {
-    const gameName = prompt('Enter the name of the game to load:');
-    if (!gameName) {
-        alert('Please enter a game name.');
-        return;
+function removeTeam(button) {
+    const teamInputs = document.getElementById('team-inputs');
+    if (teamInputs.children.length > 2) { // Keep at least 2 teams
+        button.parentElement.remove();
+        // Update placeholders
+        const inputs = teamInputs.querySelectorAll('.team-input-row');
+        inputs.forEach((row, index) => {
+            const input = row.querySelector('input');
+            if (!input.value) {
+                input.placeholder = `Team ${index + 1} Name`;
+            }
+        });
+    } else {
+        alert('You must have at least 2 teams!');
     }
-
-    const savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
-    const gameData = savedGames.find(game => game.name === gameName);
-    if (!gameData) {
-        alert('No game found with that name.');
-        return;
-    }
-
-    const { text, team1, team2, enableTimer } = gameData.data;
-    document.getElementById('text-input').value = text;
-    document.getElementById('team1-name').value = team1;
-    document.getElementById('team2-name').value = team2;
-    document.getElementById('enable-timer').checked = enableTimer;
-    alert('Game loaded!');
-});
-
-// Function to load game data if a game name is passed in the URL
-function loadGameFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const gameName = urlParams.get('gameName');
-    if (!gameName) return;
-
-    const savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
-    const gameData = savedGames.find(game => game.name === gameName);
-    if (!gameData) {
-        alert('No game found with that name.');
-        return;
-    }
-
-    const { text, team1, team2, enableTimer } = gameData.data;
-    document.getElementById('text-input').value = text;
-    document.getElementById('team1-name').value = team1;
-    document.getElementById('team2-name').value = team2;
-    document.getElementById('enable-timer').checked = enableTimer;
 }
-
-// Call the function to load game data on page load
-document.addEventListener('DOMContentLoaded', loadGameFromURL);
 
 document.getElementById('start-game').addEventListener('click', startGame);
 document.getElementById('submit-guess').addEventListener('click', submitGuess);
@@ -99,21 +56,102 @@ document.getElementById('reset-game').addEventListener('click', resetGame);
 
 function startGame() {
     text = document.getElementById('text-input').value;
-    team1Name = document.getElementById('team1-name').value || 'Team 1';
-    team2Name = document.getElementById('team2-name').value || 'Team 2';
+    if (!text) {
+        alert('Please enter text to start the game.');
+        return;
+    }
+    
+    // Get all team names
+    const teamInputs = document.querySelectorAll('.team-name-input');
+    teams = [];
+    teamInputs.forEach((input, index) => {
+        const name = input.value.trim() || `Team ${index + 1}`;
+        teams.push({ name: name, score: 0 });
+    });
+    
+    if (teams.length < 2) {
+        alert('You need at least 2 teams to play!');
+        return;
+    }
+    
     hiddenText = text.replace(/\w/g, '_');
     revealedText = hiddenText.split('');
+    guessedWords.clear(); // FIXED: Clear guessed words at start
     useTimer = document.getElementById('enable-timer').checked;
+    currentPlayerIndex = 0;
     
-    document.getElementById('hidden-text').innerHTML = hiddenText.replace(/ /g, '&nbsp;');
-    document.getElementById('current-player').textContent = `${team1Name}'s turn`;
-    document.getElementById('team1-score').textContent = `${team1Name}: ${team1Score} points`;
-    document.getElementById('team2-score').textContent = `${team2Name}: ${team2Score} points`;
+    // FIXED: Display text with proper word wrapping
+    displayHiddenText();
+    
+    updateScoresDisplay();
+    document.getElementById('current-player').textContent = `${teams[currentPlayerIndex].name}'s turn`;
+    document.getElementById('guessed-words-list').innerHTML = '';
+    
     document.getElementById('text-form').style.display = 'none';
     document.getElementById('game-board').style.display = 'block';
+    
     if (useTimer) {
-        startTimer(); // Start the timer if enabled
+        startTimer();
     }
+}
+
+// FIXED: Display hidden text without breaking words
+function displayHiddenText() {
+    const container = document.getElementById('hidden-text');
+    container.innerHTML = '';
+    
+    // Split by spaces to get words and preserve punctuation
+    const tokens = text.split(/(\s+)/); // Capture spaces too
+    
+    tokens.forEach((token, index) => {
+        if (/\s+/.test(token)) {
+            // It's whitespace, add it as-is
+            container.appendChild(document.createTextNode(token));
+        } else {
+            // It's a word (or punctuation)
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'word';
+            
+            // Replace letters with underscores, keep punctuation
+            let displayText = '';
+            for (let i = 0; i < token.length; i++) {
+                const globalIndex = text.indexOf(token, 0);
+                const charIndex = getGlobalIndex(tokens, index, i);
+                
+                if (revealedText[charIndex] !== '_' && /\w/.test(revealedText[charIndex])) {
+                    displayText += revealedText[charIndex];
+                } else if (/\w/.test(token[i])) {
+                    displayText += '_';
+                } else {
+                    displayText += token[i]; // Keep punctuation
+                }
+            }
+            
+            wordSpan.textContent = displayText;
+            container.appendChild(wordSpan);
+        }
+    });
+}
+
+// Helper function to get global character index
+function getGlobalIndex(tokens, tokenIndex, charIndex) {
+    let global = 0;
+    for (let i = 0; i < tokenIndex; i++) {
+        global += tokens[i].length;
+    }
+    return global + charIndex;
+}
+
+function updateScoresDisplay() {
+    const scoresContainer = document.getElementById('teams-scores');
+    scoresContainer.innerHTML = '';
+    
+    teams.forEach((team, index) => {
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'team-score';
+        scoreDiv.textContent = `${team.name}: ${team.score} points`;
+        scoresContainer.appendChild(scoreDiv);
+    });
 }
 
 function startTimer() {
@@ -132,98 +170,177 @@ function startTimer() {
 
 function submitGuess() {
     if (useTimer) {
-        clearInterval(timerInterval); // Stop the timer when guess is submitted
+        clearInterval(timerInterval);
     }
+    
     const guess = document.getElementById('guess-input').value.trim().toLowerCase();
     document.getElementById('guess-input').value = '';
 
     // Validate guess input
-    if (guess && /^[a-zA-Z']+$/.test(guess)) {
-        let points = 0;
-        const regex = new RegExp(`\\b${guess}\\b`, 'gi');
+    if (!guess) {
+        alert('Please enter a word.');
+        if (useTimer) startTimer();
+        return;
+    }
+    
+    if (!/^[a-zA-Z']+$/.test(guess)) {
+        alert('Please enter a valid single word without spaces or special characters.');
+        if (useTimer) startTimer();
+        return;
+    }
+    
+    // FIXED: Check if word has already been guessed
+    if (guessedWords.has(guess)) {
+        alert(`The word "${guess}" has already been guessed! No points awarded.`);
+        switchTurn();
+        return;
+    }
+    
+    // Check if the word exists in the text
+    let points = 0;
+    const regex = new RegExp(`\\b${guess}\\b`, 'gi');
+    const matches = text.match(regex);
+    
+    if (matches && matches.length > 0) {
+        // Word found! Add to guessed words
+        guessedWords.add(guess);
+        
+        // Reveal all instances of the word
         text.replace(regex, (match, offset) => {
             for (let i = 0; i < match.length; i++) {
                 revealedText[offset + i] = match[i];
             }
             points += match.length;
         });
-
-        if (points > 0) {
-            if (currentPlayer === 1) {
-                team1Score += points;
-                document.getElementById('team1-score').textContent = `${team1Name}: ${team1Score} points`;
-            } else {
-                team2Score += points;
-                document.getElementById('team2-score').textContent = `${team2Name}: ${team2Score} points`;
-            }
-        }
-
-        document.getElementById('hidden-text').innerHTML = revealedText.join('').replace(/ /g, '&nbsp;');
         
+        // Award points to current team
+        teams[currentPlayerIndex].score += points;
+        
+        // Update display
+        displayHiddenText();
+        updateScoresDisplay();
+        updateGuessedWordsList();
+        
+        // Check if game is complete
         if (!revealedText.includes('_')) {
             declareWinner();
-        } else {
-            switchTurn();
+            return;
         }
+        
+        switchTurn();
     } else {
-        alert('Please enter a valid single word without spaces.');
+        alert(`The word "${guess}" is not in the text.`);
+        switchTurn();
     }
+}
+
+function updateGuessedWordsList() {
+    const list = document.getElementById('guessed-words-list');
+    list.innerHTML = '';
+    
+    const sortedWords = Array.from(guessedWords).sort();
+    sortedWords.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        list.appendChild(li);
+    });
 }
 
 function switchTurn() {
     if (useTimer) {
         clearInterval(timerInterval);
     }
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
-    document.getElementById('current-player').textContent = currentPlayer === 1 ? `${team1Name}'s turn` : `${team2Name}'s turn`;
+    
+    currentPlayerIndex = (currentPlayerIndex + 1) % teams.length;
+    document.getElementById('current-player').textContent = `${teams[currentPlayerIndex].name}'s turn`;
+    
     if (useTimer) {
-        startTimer(); // Restart the timer for the next player if enabled
+        startTimer();
     }
 }
 
 function declareWinner() {
-    let winner = '';
-    if (team1Score > team2Score) {
-        winner = `${team1Name} wins!`;
-    } else if (team2Score > team1Score) {
-        winner = `${team2Name} wins!`;
-    } else {
-        winner = 'It\'s a tie!';
+    if (useTimer) {
+        clearInterval(timerInterval);
     }
-    alert(`Game over! ${winner}`);
-    resetGame();
+    
+    // Find the team(s) with the highest score
+    const maxScore = Math.max(...teams.map(t => t.score));
+    const winners = teams.filter(t => t.score === maxScore);
+    
+    let message = '';
+    if (winners.length === 1) {
+        message = `🏆 ${winners[0].name} wins with ${maxScore} points!`;
+    } else {
+        const winnerNames = winners.map(w => w.name).join(' and ');
+        message = `🏆 It's a tie between ${winnerNames} with ${maxScore} points!`;
+    }
+    
+    alert(`Game over! ${message}`);
+    
+    // Show final scores
+    let scoreBreakdown = '\n\nFinal Scores:\n';
+    teams.forEach(team => {
+        scoreBreakdown += `${team.name}: ${team.score} points\n`;
+    });
+    alert(scoreBreakdown);
 }
 
 function giveHint() {
-    let hint = revealedText.join('').replace(/_/g, ' ').trim();
-    alert(`Hint: ${hint}`);
+    // Show a few random revealed letters as a hint
+    const revealedWords = revealedText.join('').split(/\s+/).filter(w => !w.includes('_'));
+    if (revealedWords.length > 0) {
+        alert(`Hint - Some revealed words so far: ${revealedWords.slice(0, 3).join(', ')}`);
+    } else {
+        alert('No words have been revealed yet!');
+    }
 }
 
 function nextRound() {
-    // Implement functionality for next round if needed
-    alert('Next round functionality not implemented.');
+    if (confirm('Start a new round with the same teams but reset scores?')) {
+        // Keep teams but reset scores
+        teams.forEach(team => team.score = 0);
+        guessedWords.clear();
+        currentPlayerIndex = 0;
+        
+        // Ask for new text
+        const newText = prompt('Enter new text for the next round:');
+        if (newText) {
+            text = newText;
+            hiddenText = text.replace(/\w/g, '_');
+            revealedText = hiddenText.split('');
+            
+            displayHiddenText();
+            updateScoresDisplay();
+            document.getElementById('current-player').textContent = `${teams[currentPlayerIndex].name}'s turn`;
+            document.getElementById('guessed-words-list').innerHTML = '';
+            
+            if (useTimer) {
+                startTimer();
+            }
+        }
+    }
 }
 
 function resetGame() {
-    // Reset the game variables and UI
+    if (useTimer) {
+        clearInterval(timerInterval);
+    }
+    
+    // Reset everything
     document.getElementById('text-form').style.display = 'block';
     document.getElementById('game-board').style.display = 'none';
     document.getElementById('text-input').value = '';
-    document.getElementById('team1-name').value = '';
-    document.getElementById('team2-name').value = '';
     document.getElementById('enable-timer').checked = false;
     document.getElementById('hidden-text').innerHTML = '';
     document.getElementById('current-player').textContent = '';
     document.getElementById('timer').style.display = 'none';
-    if (useTimer) {
-        clearInterval(timerInterval);
-    }
+    document.getElementById('guessed-words-list').innerHTML = '';
+    
     text = '';
     hiddenText = '';
-    team1Name = '';
-    team2Name = '';
-    currentPlayer = 1;
-    team1Score = 0;
-    team2Score = 0;
+    teams = [];
+    currentPlayerIndex = 0;
     revealedText = [];
+    guessedWords.clear();
 }
