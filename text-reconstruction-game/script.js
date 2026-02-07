@@ -50,7 +50,6 @@ document.getElementById('guess-input').addEventListener('keypress', function(eve
 document.getElementById('see-text').addEventListener('click', () => {
     alert(text); // Display the original text in an alert box
 });
-document.getElementById('give-hint').addEventListener('click', giveHint);
 document.getElementById('next-round').addEventListener('click', nextRound);
 document.getElementById('reset-game').addEventListener('click', resetGame);
 
@@ -286,20 +285,9 @@ function declareWinner() {
     alert(scoreBreakdown);
 }
 
-function giveHint() {
-    // Show a few random revealed letters as a hint
-    const revealedWords = revealedText.join('').split(/\s+/).filter(w => !w.includes('_'));
-    if (revealedWords.length > 0) {
-        alert(`Hint - Some revealed words so far: ${revealedWords.slice(0, 3).join(', ')}`);
-    } else {
-        alert('No words have been revealed yet!');
-    }
-}
-
 function nextRound() {
-    if (confirm('Start a new round with the same teams but reset scores?')) {
-        // Keep teams but reset scores
-        teams.forEach(team => team.score = 0);
+    if (confirm('Start a new round with the same teams? (Scores will be kept)')) {
+        // Keep teams AND their scores
         guessedWords.clear();
         currentPlayerIndex = 0;
         
