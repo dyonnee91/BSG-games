@@ -5,7 +5,7 @@ let currentPlayerIndex = 0;
 let revealedText = [];
 let guessedWords = new Set(); // FIXED: Track guessed words to prevent duplicates
 let timerInterval;
-const turnTime = 60; // Time in seconds for each turn
+let turnTime = 60; // Time in seconds for each turn (can be modified)
 let useTimer = false;
 
 // Add/Remove Team functionality
@@ -20,6 +20,16 @@ document.getElementById('add-team-btn').addEventListener('click', () => {
         <button class="remove-team-btn" onclick="removeTeam(this)">Remove</button>
     `;
     teamInputs.appendChild(row);
+});
+
+// Show/hide timer duration input when timer checkbox is toggled
+document.getElementById('enable-timer').addEventListener('change', function() {
+    const timerSettings = document.getElementById('timer-settings');
+    if (this.checked) {
+        timerSettings.style.display = 'block';
+    } else {
+        timerSettings.style.display = 'none';
+    }
 });
 
 function removeTeam(button) {
@@ -77,6 +87,13 @@ function startGame() {
     revealedText = hiddenText.split('');
     guessedWords.clear(); // FIXED: Clear guessed words at start
     useTimer = document.getElementById('enable-timer').checked;
+    
+    // Get custom timer duration if timer is enabled
+    if (useTimer) {
+        const customMinutes = parseInt(document.getElementById('timer-duration').value);
+        turnTime = (customMinutes || 5) * 60; // Convert minutes to seconds, default 5 minutes
+    }
+    
     currentPlayerIndex = 0;
     
     // FIXED: Display text with proper word wrapping
@@ -156,10 +173,18 @@ function updateScoresDisplay() {
 function startTimer() {
     let timeLeft = turnTime;
     document.getElementById('timer').style.display = 'block';
-    document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+    
+    // Format time as MM:SS
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+    
+    document.getElementById('timer').textContent = `Time left: ${formatTime(timeLeft)}`;
     timerInterval = setInterval(() => {
         timeLeft--;
-        document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+        document.getElementById('timer').textContent = `Time left: ${formatTime(timeLeft)}`;
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             switchTurn();
