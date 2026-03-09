@@ -269,10 +269,11 @@
             margin-bottom: 1.5rem;
             min-height: 200px;
             box-shadow: 0 10px 40px var(--shadow);
-            border: 2px dashed rgba(251, 191, 36, 0.3);
+            border: 2px dashed rgba(251, 205, 7, 0.3);
             display: grid;
             gap: 1rem;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            overflow: hidden; /* Prevent overflow */
         }
 
         /* Grid layouts based on chunk count */
@@ -287,10 +288,10 @@
         .chunks-container.grid-15 { grid-template-columns: repeat(5, 1fr); }
         .chunks-container.grid-16 { grid-template-columns: repeat(4, 1fr); }
         .chunks-container.grid-18 { grid-template-columns: repeat(6, 1fr); }
-        .chunks-container.grid-20 { grid-template-columns: repeat(5, 1fr); }
+        .chunks-container.grid-20 { grid-template-columns: repeat(4, 1fr); } /* 4x5 grid for 20 */
 
         .chunk {
-            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            background: #ffffff;
             padding: 1rem 1.5rem;
             border-radius: 12px;
             cursor: move;
@@ -299,9 +300,9 @@
             -moz-user-select: none;
             -ms-user-select: none;
             transition: all 0.2s ease;
-            border: 2px solid transparent;
+            border: 2px solid var(--bg-tertiary);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.6;
             position: relative;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -310,12 +311,14 @@
             justify-content: center;
             text-align: center;
             min-height: 80px;
+            color: #11274e;
+            font-weight: 500;
         }
 
         .chunk:hover {
             border-color: var(--accent-1);
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.2);
+            box-shadow: 0 4px 20px rgba(251, 205, 7, 0.3);
         }
 
         .chunk.dragging {
@@ -325,14 +328,15 @@
 
         .chunk.drag-over {
             border-color: var(--accent-1);
-            border-style: solid;
-            background: linear-gradient(135deg, rgba(251, 205, 7, 0.2) 0%, var(--bg-tertiary) 100%);
+            border-width: 3px;
+            background: #fffbeb;
         }
 
         .chunk.correct {
             background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             border-color: var(--success);
             animation: correctPulse 0.5s ease-out;
+            color: white;
         }
 
         .chunk.correct .chunk-number {
@@ -509,6 +513,10 @@
             </div>
 
             <div class="score-display" id="scoreDisplay" style="display: none;"></div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="window.location.href='../index.html'" class="secondary-btn">Go Back to Main Page</button>
         </div>
     </div>
 
