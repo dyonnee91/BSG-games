@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tug of War Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #11274e;
+            --bg-secondary: #1a3668;
+            --accent-yellow: #fbcd07;
+            --accent-red: #e82c39;
+            --text-light: #f1f5f9;
+            --team1-color: #3b82f6;
+            --team2-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #11274e 0%, #1a3668 50%, #244785 100%);
+            background-attachment: fixed;
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #school-logo {
+            max-width: 150px;
+            display: block;
+            margin: 0 auto 1rem auto;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: var(--accent-yellow);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .setup-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(251, 205, 7, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-yellow);
+            font-size: 1.1rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid #244785;
+            background: #ffffff;
+            color: #11274e;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 200px;
+            font-family: monospace;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 0 4px rgba(251, 205, 7, 0.2);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, #e8b800 100%);
+            color: var(--bg-primary);
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(251, 205, 7, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(251, 205, 7, 0.4);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, #e82c39 0%, #d02532 100%);
+        }
+
+        .game-area {
+            display: none;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            gap: 2rem;
+        }
+
+        .team-score {
+            flex: 1;
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 3px solid;
+        }
+
+        .team1 {
+            border-color: var(--team1-color);
+        }
+
+        .team2 {
+            border-color: var(--team2-color);
+        }
+
+        .team-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .team1 .team-name {
+            color: var(--team1-color);
+        }
+
+        .team2 .team-name {
+            color: var(--team2-color);
+        }
+
+        .score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        .rope-container {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(251, 205, 7, 0.2);
+            overflow: hidden;
+        }
+
+        .rope-track {
+            position: relative;
+            height: 60px;
+            background: linear-gradient(to right, var(--team1-color) 0%, transparent 20%, transparent 80%, var(--team2-color) 100%);
+            border-radius: 30px;
+            margin: 2rem 0;
+        }
+
+        .center-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-red);
+            transform: translateX(-50%);
+        }
+
+        .rope-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: var(--accent-yellow);
+            border-radius: 50%;
+            border: 5px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: left 0.5s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .question-area {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(251, 205, 7, 0.2);
+        }
+
+        .current-team {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(251, 205, 7, 0.2) 0%, rgba(36, 71, 133, 0.2) 100%);
+            border-radius: 12px;
+        }
+
+        .question {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: white;
+            line-height: 1.6;
+        }
+
+        .answer-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .answer-input input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .answer-input button {
+            padding: 1rem 2rem;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #10b981;
+            color: white;
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .feedback.incorrect {
+            background: #ef4444;
+            color: white;
+            display: block;
+            animation: shake 0.5s ease-out;
+        }
+
+        .winner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .winner-modal.active {
+            display: flex;
+        }
+
+        .winner-content {
+            background: var(--bg-secondary);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 5px solid var(--accent-yellow);
+            animation: popIn 0.5s ease-out;
+        }
+
+        .winner-content h2 {
+            font-size: 3rem;
+            color: var(--accent-yellow);
+            margin-bottom: 1rem;
+        }
+
+        .winner-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, rgba(251, 205, 7, 0.2) 0%, rgba(36, 71, 133, 0.2) 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(251, 205, 7, 0.3);
+        }
+
+        .instructions h3 {
+            color: var(--accent-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions ul {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .back-button {
+            text-align: center;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="school-logo" src="../school-logo.png" alt="School Logo">
+        <h1>Tug of War Game</h1>
+        <p class="subtitle">Two teams compete - pull the rope by answering questions correctly!</p>
+
+        <div class="instructions">
+            <h3>How to play:</h3>
+            <ul>
+                <li>Enter team names and questions with answers</li>
+                <li>Teams take turns answering questions</li>
+                <li>Correct answer = pull rope 10% toward your side</li>
+                <li>First team to pull the marker to their edge (90%) wins!</li>
+                <li>Format: Question?|Answer (one per line)</li>
+            </ul>
+        </div>
+
+        <div class="setup-section">
+            <label for="team1-name">Team 1 Name:</label>
+            <input type="text" id="team1-name" placeholder="Blue Team">
+
+            <label for="team2-name">Team 2 Name:</label>
+            <input type="text" id="team2-name" placeholder="Red Team">
+
+            <label for="questions-input">Questions & Answers (Question?|Answer):</label>
+            <textarea id="questions-input" placeholder="What is 2+2?|4
+What is the capital of France?|Paris
+What color is the sky?|Blue
+Who wrote Romeo and Juliet?|Shakespeare"></textarea>
+
+            <button id="start-btn">Start Game</button>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="scoreboard">
+                <div class="team-score team1">
+                    <div class="team-name" id="team1-display">Team 1</div>
+                    <div class="score" id="team1-score">0</div>
+                </div>
+                <div class="team-score team2">
+                    <div class="team-name" id="team2-display">Team 2</div>
+                    <div class="score" id="team2-score">0</div>
+                </div>
+            </div>
+
+            <div class="rope-container">
+                <div class="rope-track">
+                    <div class="center-line"></div>
+                    <div class="rope-marker" id="ropeMarker" style="left: 50%;">
+                        🎯
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-area">
+                <div class="current-team" id="currentTeam">Team 1's Turn</div>
+                <div class="question" id="questionText">Question will appear here</div>
+                <div class="answer-input">
+                    <input type="text" id="answerInput" placeholder="Type your answer here...">
+                    <button id="submitAnswer">Submit</button>
+                </div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button id="newGameBtn" class="secondary-btn">New Game</button>
+            </div>
+        </div>
+
+        <div class="winner-modal" id="winnerModal">
+            <div class="winner-content">
+                <h2>🏆 Victory! 🏆</h2>
+                <p id="winnerText">Team Wins!</p>
+                <button id="playAgain">Play Again</button>
+            </div>
+        </div>
+
+        <div class="back-button">
+            <button onclick="window.location.href='../index.html'" class="secondary-btn">Go Back to Main Page</button>
+        </div>
+    </div>
+
+    <script>
+        let team1Name = "Team 1";
+        let team2Name = "Team 2";
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let currentTeam = 1;
+        let team1Score = 0;
+        let team2Score = 0;
+        let ropePosition = 50; // 0 = Team 1 wins, 100 = Team 2 wins
+
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('submitAnswer').addEventListener('click', checkAnswer);
+        document.getElementById('answerInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+        document.getElementById('newGameBtn').addEventListener('click', resetGame);
+        document.getElementById('playAgain').addEventListener('click', resetGame);
+
+        function startGame() {
+            team1Name = document.getElementById('team1-name').value.trim() || "Team 1";
+            team2Name = document.getElementById('team2-name').value.trim() || "Team 2";
+            
+            const input = document.getElementById('questions-input').value.trim();
+            if (!input) {
+                alert('Please enter questions and answers!');
+                return;
+            }
+
+            // Parse questions
+            questions = input.split('\n').filter(line => line.includes('|')).map(line => {
+                const [question, answer] = line.split('|');
+                return { question: question.trim(), answer: answer.trim().toLowerCase() };
+            });
+
+            if (questions.length < 3) {
+                alert('Please enter at least 3 questions!');
+                return;
+            }
+
+            // Shuffle questions
+            questions.sort(() => Math.random() - 0.5);
+
+            // Initialize game
+            document.getElementById('team1-display').textContent = team1Name;
+            document.getElementById('team2-display').textContent = team2Name;
+            document.querySelector('.setup-section').style.display = 'none';
+            document.getElementById('gameArea').classList.add('active');
+
+            showNextQuestion();
+        }
+
+        function showNextQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                currentQuestionIndex = 0; // Loop questions
+            }
+
+            const q = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = q.question;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerInput').focus();
+            document.getElementById('currentTeam').textContent = currentTeam === 1 ? `${team1Name}'s Turn` : `${team2Name}'s Turn`;
+            document.getElementById('feedback').className = 'feedback';
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const correctAnswer = questions[currentQuestionIndex].answer;
+
+            const feedback = document.getElementById('feedback');
+
+            if (userAnswer === correctAnswer) {
+                // Correct!
+                feedback.textContent = '✓ Correct! Pulling rope...';
+                feedback.className = 'feedback correct';
+
+                if (currentTeam === 1) {
+                    team1Score++;
+                    ropePosition -= 10; // Pull toward team 1
+                } else {
+                    team2Score++;
+                    ropePosition += 10; // Pull toward team 2
+                }
+
+                updateScores();
+                updateRope();
+
+                // Check for winner
+                if (ropePosition <= 10) {
+                    setTimeout(() => declareWinner(team1Name), 1000);
+                    return;
+                } else if (ropePosition >= 90) {
+                    setTimeout(() => declareWinner(team2Name), 1000);
+                    return;
+                }
+
+                // Next turn
+                setTimeout(() => {
+                    currentTeam = currentTeam === 1 ? 2 : 1;
+                    currentQuestionIndex++;
+                    showNextQuestion();
+                }, 1500);
+
+            } else {
+                // Incorrect
+                feedback.textContent = `✗ Incorrect! The answer was: ${questions[currentQuestionIndex].answer}`;
+                feedback.className = 'feedback incorrect';
+
+                setTimeout(() => {
+                    currentTeam = currentTeam === 1 ? 2 : 1;
+                    currentQuestionIndex++;
+                    showNextQuestion();
+                }, 2000);
+            }
+        }
+
+        function updateScores() {
+            document.getElementById('team1-score').textContent = team1Score;
+            document.getElementById('team2-score').textContent = team2Score;
+        }
+
+        function updateRope() {
+            const marker = document.getElementById('ropeMarker');
+            marker.style.left = ropePosition + '%';
+        }
+
+        function declareWinner(teamName) {
+            document.getElementById('winnerText').textContent = `${teamName} Wins!`;
+            document.getElementById('winnerModal').classList.add('active');
+        }
+
+        function resetGame() {
+            team1Score = 0;
+            team2Score = 0;
+            ropePosition = 50;
+            currentQuestionIndex = 0;
+            currentTeam = 1;
+
+            document.querySelector('.setup-section').style.display = 'block';
+            document.getElementById('gameArea').classList.remove('active');
+            document.getElementById('winnerModal').classList.remove('active');
+            updateScores();
+            updateRope();
+        }
+    </script>
+</body>
+</html>
