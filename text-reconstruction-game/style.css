@@ -67,7 +67,9 @@ button:hover {
     max-width: 100%;         /* Prevent overflow */
     box-sizing: border-box;  /* Include padding in width */
 }
-
+#hidden-text .word {
+    letter-spacing: 0.3em;
+}
 /* ===== Player & Scores ===== */
 #current-player, #team1-score, #team2-score {
     font-weight: bold;

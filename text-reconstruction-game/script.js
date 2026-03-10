@@ -207,7 +207,7 @@ function submitGuess() {
         return;
     }
     
-    if (!/^[a-zA-Z']+$/.test(guess)) {
+    if (!/^[a-zA-Z0-9'àáâãäåèéêëìíîïòóôõöùúûüýÿçñ]+$/.test(guess)) {
         alert('Please enter a valid single word without spaces or special characters.');
         if (useTimer) startTimer();
         return;
