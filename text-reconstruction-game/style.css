@@ -61,7 +61,7 @@ button:hover {
     white-space: pre;        /* Preserve spacing and line breaks exactly */
     word-break: keep-all;    /* Prevent breaking long sequences of letters/underscores */
     overflow-wrap: normal;   /* Don’t break words automatically */
-    letter-spacing: 0.2em;   /* Adjust spacing between underscores/letters */
+    letter-spacing: 0.3em;   /* Adjust spacing between underscores/letters */
     text-align: left;        /* Align text properly */
     display: inline-block;   /* Keep layout stable */
     max-width: 100%;         /* Prevent overflow */
